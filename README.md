@@ -4,7 +4,7 @@ fork project for python 3
 
 remove watermark from iconfinder png 
 
-## intalll
+## install
 
 ```bash
 https://github.com/Soontao/iconfinder
