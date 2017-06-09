@@ -7,7 +7,7 @@ remove watermark from iconfinder png
 ## install
 
 ```bash
-https://github.com/Soontao/iconfinder
+git clone https://github.com/Soontao/iconfinder
 cd iconfinder
 pip install Pillow
 ```
