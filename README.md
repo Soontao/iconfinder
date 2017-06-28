@@ -6,9 +6,9 @@ remove watermark from iconfinder png
 
 ## update
 
-now, with update, script can process any icon under 512 * 512 px, pls dont delete *_empty_512.png* file
+now, with update, script can process any icons under 512 * 512 px, and pls dont delete *_empty_512.png* file
 
-and, with update, you could process whole directory
+meanwhile, with update, you could process all files in a specific directory
 
 ## install
 
@@ -32,4 +32,4 @@ python ./unmark.py [path-to-directory]
 
 ## warning
 
-use right click to download icon, not use screenshot
+use right click to download icon, and do not use screenshots
