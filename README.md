@@ -2,7 +2,13 @@
 
 fork project for python 3
 
-remove watermark from iconfinder png 
+remove watermark from iconfinder png
+
+## update
+
+now, with update, script can process any icon under 512 * 512 px, pls dont delete *_empty_512.png* file
+
+and, with update, you could process whole directory
 
 ## install
 
@@ -12,10 +18,16 @@ cd iconfinder
 pip install Pillow
 ```
 
-## usage 
+## usage
 
 ```bash
 python ./unmark.py [path-to-file-name]
+```
+
+or
+
+```bash
+python ./unmark.py [path-to-directory]
 ```
 
 ## warning

@@ -1,7 +1,9 @@
-# coding:utf-8
-
-from PIL import Image
 import sys
+import os
+import glob
+from PIL import Image
+
+_pattern_file_path = os.path.abspath('_empty_512.png')
 
 
 def get_data(height, width, interval, datalen, start):
@@ -60,36 +62,56 @@ def rec(x, i):
 
 
 def unmark(filename):
-    im = Image.open(filename)
-    im = im.convert("RGBA")
-    kk = im.load()
-    func = raw_data.get(im.size[0])
-    if not func:
-        print("NOT SUPPORT SIZE (128, 256, 512)")
-        sys.exit()
+    image = Image.open(filename)
+    image = image.convert("RGBA")
+    image = unmark_process(image)
+    save_file(filename, image)
 
-    print("SIZE: ", im.size)
+
+def unmark_process(image):
+    kk = image.load()
+    func = raw_data.get(image.size[0])
+    print("SIZE: ", image.size)
+    if not func:
+        print("NOT SUPPORT SIZE, USE ALTERNALTIVE WAY")
+        resized_img = resize_file_to_512(image)
+        processd_img = unmark_process(resized_img)
+        restored_size_img = restore_file_to_origin(processd_img, image)
+        return restored_size_img
+
     nodes = func()
 
     for index, node in enumerate(nodes):
         if node == 0:
             continue
 
-        i = index % im.size[1]
-        j = index / im.size[1]
+        i = index % image.size[1]
+        j = index / image.size[1]
 
         if transparent(kk[i, j]):
             kk[i, j] = (0, 0, 0, 0)
         else:
-            if (i > 1 and nodes[index - 1] == 0) or (j < im.size[1] - 1 and nodes[index + 1] == 0):
+            if (i > 1 and nodes[index - 1] == 0) or (j < image.size[1] - 1 and nodes[index + 1] == 0):
                 kk[i, j] = rec(kk[i, j], 0.015)
-            elif (i > 2 and nodes[index - 2] == 0) or (j < im.size[1] - 2 and nodes[index + 2] == 0):
+            elif (i > 2 and nodes[index - 2] == 0) or (j < image.size[1] - 2 and nodes[index + 2] == 0):
                 kk[i, j] = rec(kk[i, j], 0.065)
             else:
                 kk[i, j] = rec(kk[i, j], 0.073)
+    return image
 
+
+def resize_file_to_512(img):
+    pattern = Image.open(_pattern_file_path)
+    pattern.paste(img.crop((0, 0) + img.size))
+    return pattern
+
+
+def restore_file_to_origin(resized_img, origin_img):
+    return resized_img.crop((0, 0) + origin_img.size)
+
+
+def save_file(filename, im):
     new_name = filename.lower().replace(".png", ".new.png")
-
     print("NEW: ", new_name)
     im.save(new_name, "PNG")
 
@@ -102,7 +124,10 @@ def show(x, n):
 
 
 if __name__ == '__main__':
-    unmark(sys.argv[1])
-
-
-
+    sPath = os.path.abspath(sys.argv[1])
+    if os.path.isdir(sPath):
+        for filepath in glob.glob(os.path.join(sPath, '*.png')):
+            if not filepath.endswith('.new.png'):
+                unmark(filepath)
+    else:
+        unmark(sPath)
