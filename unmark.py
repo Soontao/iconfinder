@@ -1,10 +1,12 @@
 import sys
 import os
 import glob
-from PIL import Image
 
-_pattern_file_path = os.path.abspath('_empty_512.png')
-
+try:
+    from PIL import Image
+except ImportError as e:
+    print('use "pip install pillow" install dependency !')
+    exit(1)
 
 def get_data(height, width, interval, datalen, start):
     # first line: 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0 ...
@@ -101,9 +103,9 @@ def unmark_process(image):
 
 
 def resize_file_to_512(img):
-    pattern = Image.open(_pattern_file_path)
-    pattern.paste(img.crop((0, 0) + img.size))
-    return pattern
+    empty_512_image = Image.new('RGBA', (512, 512))
+    empty_512_image.paste(img.crop((0, 0) + img.size))
+    return empty_512_image
 
 
 def restore_file_to_origin(resized_img, origin_img):
