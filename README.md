@@ -6,7 +6,7 @@ remove watermark from iconfinder png
 
 ## update
 
-now, with update, script can process any icons under 512 * 512 px
+now, with update, this script could process any icons under 512 * 512 px
 
 meanwhile, with update, you could process all files in a specific directory
 
