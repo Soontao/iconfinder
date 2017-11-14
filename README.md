@@ -6,11 +6,13 @@ remove watermark from iconfinder png
 
 ## update
 
-now, with update, this script could process any icons under 512 * 512 px
+now, with updates, this script could process any icons, no limit.
 
-meanwhile, with update, you could process all files in a specific directory
+meanwhile, with update, you could process all files in a images directory
 
 ## install
+
+download script and install dependecies
 
 ```bash
 git clone https://github.com/Soontao/iconfinder
@@ -21,15 +23,14 @@ pip install Pillow
 ## usage
 
 ```bash
-python ./unmark.py [path-to-file-name]
+>python unmark.py
+Icon Find Unmark Tool
+
+Usage: python unmark.py [file path|directory path]
 ```
 
-or
+## limitation
 
-```bash
-python ./unmark.py [path-to-directory]
-```
+* use right click to download icon, and **do not** use the screenshots
 
-## warning
-
-use right click to download icon, and do not use screenshots
+* only support png files

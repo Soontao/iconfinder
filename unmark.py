@@ -1,12 +1,14 @@
+# coding:utf-8
+
 import sys
 import os
 import glob
-
 try:
     from PIL import Image
-except ImportError as e:
-    print('use "pip install pillow" install dependency !')
-    exit(1)
+except ImportError as err:
+    print("Import Error, please install Pillow with pip:\n\npip install Pillow")
+    exit()
+
 
 def get_data(height, width, interval, datalen, start):
     # first line: 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0 ...
@@ -23,29 +25,6 @@ def get_data(height, width, interval, datalen, start):
         start += 1
     return data
 
-
-def get512():
-    return get_data(512, 512, 13, 7, 3)
-
-
-def get256():
-    return get_data(256, 256, 13, 7, 3)
-
-
-def get128():
-    return get_data(128, 128, 13, 7, 3)
-
-
-def get48():
-    return get_data(48, 48, 5, 5, 2)
-
-
-raw_data = {
-    # 48: get48,
-    128: get128,
-    256: get256,
-    512: get512
-}
 
 
 def transparent(point):
@@ -64,72 +43,47 @@ def rec(x, i):
 
 
 def unmark(filename):
-    image = Image.open(filename)
-    image = image.convert("RGBA")
-    image = unmark_process(image)
-    save_file(filename, image)
+    # skip processed png files
+    if filename.endswith(".unmarked.png"):
+        return
+    # with universal method
+    print("PROCESSING: ", filename)
+    im = Image.open(filename)
+    im = im.convert("RGBA")
+    kk = im.load()
+    nodes = get_data(im.size[1],im.size[0],13,7,3)
 
-
-def unmark_process(image):
-    kk = image.load()
-    func = raw_data.get(image.size[0])
-    print("SIZE: ", image.size)
-    if not func:
-        print("NOT SUPPORT SIZE, USE ALTERNALTIVE WAY")
-        resized_img = resize_file_to_512(image)
-        processd_img = unmark_process(resized_img)
-        restored_size_img = restore_file_to_origin(processd_img, image)
-        return restored_size_img
-
-    nodes = func()
 
     for index, node in enumerate(nodes):
         if node == 0:
             continue
 
-        i = index % image.size[1]
-        j = index / image.size[1]
+        i = index % im.size[0]
+        j = index / im.size[0]
 
         if transparent(kk[i, j]):
             kk[i, j] = (0, 0, 0, 0)
         else:
-            if (i > 1 and nodes[index - 1] == 0) or (j < image.size[1] - 1 and nodes[index + 1] == 0):
+            if (i > 1 and nodes[index - 1] == 0) or (j < im.size[1] - 1 and nodes[index + 1] == 0):
                 kk[i, j] = rec(kk[i, j], 0.015)
-            elif (i > 2 and nodes[index - 2] == 0) or (j < image.size[1] - 2 and nodes[index + 2] == 0):
+            elif (i > 2 and nodes[index - 2] == 0) or (j < im.size[1] - 2 and nodes[index + 2] == 0):
                 kk[i, j] = rec(kk[i, j], 0.065)
             else:
                 kk[i, j] = rec(kk[i, j], 0.073)
-    return image
 
+    new_name = filename.lower().replace(".png", ".unmarked.png")
 
-def resize_file_to_512(img):
-    empty_512_image = Image.new('RGBA', (512, 512))
-    empty_512_image.paste(img.crop((0, 0) + img.size))
-    return empty_512_image
-
-
-def restore_file_to_origin(resized_img, origin_img):
-    return resized_img.crop((0, 0) + origin_img.size)
-
-
-def save_file(filename, im):
-    new_name = filename.lower().replace(".png", ".new.png")
-    print("NEW: ", new_name)
+    print("SAVED: ", new_name)
     im.save(new_name, "PNG")
 
 
-def show(x, n):
-    for i in range(n):
-        for j in range(n):
-            print(x[i * n + j]),
-        print()
-
-
 if __name__ == '__main__':
-    sPath = os.path.abspath(sys.argv[1])
-    if os.path.isdir(sPath):
-        for filepath in glob.glob(os.path.join(sPath, '*.png')):
-            if not filepath.endswith('.new.png'):
+    if len(sys.argv) != 2:
+        print("Icon Find Unmark Tool\n\nUsage: python unmark.py [file path|directory path]")
+    else :
+        sPath = os.path.abspath(sys.argv[1])
+        if os.path.isdir(sPath):
+            for filepath in glob.glob(os.path.join(sPath, '*.png')):
                 unmark(filepath)
-    else:
-        unmark(sPath)
+        else:
+            unmark(sPath)
